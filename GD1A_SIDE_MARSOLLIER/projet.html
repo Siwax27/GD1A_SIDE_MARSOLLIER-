@@ -1,0 +1,98 @@
+<!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8" /><title>Mon 1er jeu Phaser</title>
+            <script
+            src="//cdn.jsdelivr.net/npm/phaser@3.55.0/dist/phaser.js"></script>
+            <style type="text/css"> body { margin: 0; }</style>
+        </head>
+        <body>
+            <script type="text/javascript">
+                var config = {
+                type: Phaser.AUTO,
+                width: 800, height: 600,
+                physics: {
+                        default: 'arcade',
+                        arcade: {
+                            gravity: { y: 300 },
+                            debug: false
+                        }},
+                scene: {preload: preload, create: create, update: update }
+                };
+                new Phaser.Game(config);
+                function preload(){
+                    this.load.image("Phaser_tuilesdejeu", "assets/toute les sprites.png");
+                    this.load.tilemapTiledJSON("carte", "assets/map.json");
+                    this.load.image("inari", "assets/inari.png")
+                    this.load.spritesheet('perso','assets/okuninushi.png',
+                    { frameWidth: 64, frameHeight: 60 });
+                }
+                function create(){
+                    cursors = this.input.keyboard.createCursorKeys();
+
+                    const carteDuNiveau = this.add.tilemap("carte");
+
+                    const tileset = carteDuNiveau.addTilesetImage("décors","Phaser_tuilesdejeu");
+                    
+                    const backgroundLayer = carteDuNiveau.createStaticLayer("paysage",tileset);
+
+                    const backgroundLayer2 = carteDuNiveau.createStaticLayer("paysage2",tileset);
+
+
+                    const solmaison = carteDuNiveau.createStaticLayer("solinterieur",tileset);
+
+                    const plateformes = carteDuNiveau.createStaticLayer(
+                    "solexterieur",
+                    tileset
+                    ); 
+                    const maison = carteDuNiveau.createStaticLayer("maison",tileset);
+                    const arbre = carteDuNiveau.createStaticLayer("arbre",tileset);
+
+                    player = this.physics.add.sprite(500,945, 'perso')
+
+                   
+                    
+
+                    plateformes.setCollisionByProperty({ estSolide: true });
+
+
+                    this.physics.add.collider(player, plateformes);
+
+
+                    this.physics.world.setBounds(0, 0, 3200, 1088);
+                    this.cameras.main.setBounds(0, 0, 3200, 1088);
+                    this.cameras.main.startFollow(player);
+                    this.anims.create({
+                    key: 'right',
+                    frames: [ { key: 'perso', frame: 1 } ],
+                    frameRate: 10,
+                    repeat: -1
+                    });
+                    this.anims.create({
+                    key: 'left',
+                    frames: [ { key: 'perso', frame: 0 } ],
+                    frameRate: 10,
+                    repeat: -1
+                    });
+                }
+                function update(){
+                    if (cursors.left.isDown){ //si la touche gauche est appuyée
+                    player.setVelocityX(-160); //alors vitesse négative en X
+                    player.anims.play('left', true);
+                    }
+                    else if (cursors.right.isDown){ //sinon si la touche droite est appuyée
+                    player.setVelocityX(160); //alors vitesse positive en X
+                    player.anims.play('right', true);
+                    }
+                    else{ // sinon
+                    player.setVelocityX(0); //vitesse nulle
+                   
+                    }
+                    if (cursors.up.isDown && player.body.blocked.down) {
+                    player.setVelocityY(-200);
+                    } 
+
+                }
+            </script>
+        </body>
+    </html>
